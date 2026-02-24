@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFT Marketplace — MoltGrid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #050508;
+      --bg-secondary: #0a0a0f;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+      --text-primary: rgba(255, 255, 255, 0.95);
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --text-tertiary: rgba(255, 255, 255, 0.4);
+      --accent-primary: #6366f1;
+      --accent-secondary: #8b5cf6;
+      --accent-glow: rgba(99, 102, 241, 0.4);
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+      --gradient-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', monospace;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-family); font-size: 16px; line-height: 1.6; color: var(--text-primary); background: var(--bg-primary); min-height: 100vh; overflow-x: hidden; }
+
+    .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; animation: float 20s ease-in-out infinite; }
+    .orb-1 { width: 500px; height: 500px; background: var(--accent-primary); top: -150px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: -100px; left: -100px; animation-delay: -7s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
+
+    /* Nav */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 2rem; background: rgba(5, 5, 8, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+    .nav-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+    .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-primary); }
+    .logo-mark { width: 40px; height: 40px; border-radius: var(--radius-md); overflow: hidden; flex-shrink: 0; }
+    .logo-text { font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 10px 20px; font-family: inherit; font-size: 14px; font-weight: 500; border: none; border-radius: var(--radius-full); cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px var(--accent-glow); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--glass-border); }
+    .btn-ghost:hover { background: var(--glass-bg); color: var(--text-primary); }
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 8px 16px; font-size: 13px; }
+
+    /* Main */
+    main { position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 100px 2rem 4rem; }
+
+    /* Glass Card */
+    .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(20px); padding: 1.5rem; transition: all 0.25s; }
+    .glass-card:hover { background: var(--glass-hover); border-color: rgba(255, 255, 255, 0.12); }
+
+    /* Hero Banner */
+    .market-hero { padding: 2.5rem; margin-bottom: 2rem; background: var(--gradient-subtle); border-color: rgba(99, 102, 241, 0.2); }
+    .market-hero .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 6px 14px; background: rgba(99, 102, 241, 0.15); border-radius: var(--radius-full); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-primary); margin-bottom: 1rem; }
+    .market-hero h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+    .market-hero p { color: var(--text-secondary); font-size: 16px; margin-bottom: 1.5rem; max-width: 600px; }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    /* Stats Bar */
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { text-align: center; padding: 1.25rem; }
+    .stat-card .stat-value { display: block; font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .stat-card .stat-label { font-size: 12px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Filters */
+    .filter-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .filter-tabs { display: flex; gap: 0.5rem; }
+    .filter-tab { padding: 8px 16px; font-family: inherit; font-size: 13px; font-weight: 500; background: transparent; color: var(--text-tertiary); border: 1px solid transparent; border-radius: var(--radius-full); cursor: pointer; transition: all 0.15s; }
+    .filter-tab:hover { color: var(--text-secondary); }
+    .filter-tab.active { background: var(--glass-bg); color: var(--text-primary); border-color: var(--glass-border); }
+    .search-box { display: flex; align-items: center; gap: 0.5rem; padding: 8px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-full); }
+    .search-box input { background: transparent; border: none; outline: none; color: var(--text-primary); font-family: inherit; font-size: 14px; width: 200px; }
+    .search-box input::placeholder { color: var(--text-tertiary); }
+
+    /* NFT Grid */
+    .nft-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+
+    .nft-card { padding: 0; overflow: hidden; cursor: pointer; }
+    .nft-card:hover { transform: translateY(-4px); box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+    .nft-image { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.15) 50%, rgba(168,85,247,0.1) 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .nft-image img { width: 100%; height: 100%; object-fit: cover; }
+    .nft-image .placeholder-icon { font-size: 4rem; opacity: 0.3; }
+    .nft-chain-badge { position: absolute; top: 12px; left: 12px; padding: 4px 10px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-radius: var(--radius-full); font-size: 11px; font-weight: 600; color: var(--text-primary); }
+    .nft-like-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-radius: 50%; border: none; cursor: pointer; font-size: 16px; transition: all 0.15s; }
+    .nft-like-btn:hover { background: rgba(239, 68, 68, 0.3); transform: scale(1.1); }
+
+    .nft-info { padding: 1rem; }
+    .nft-collection { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-primary); margin-bottom: 3px; }
+    .nft-name { font-size: 14px; font-weight: 600; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nft-price-row { display: flex; align-items: center; justify-content: space-between; }
+    .nft-price { display: flex; flex-direction: column; }
+    .nft-price .label { font-size: 11px; color: var(--text-tertiary); }
+    .nft-price .value { font-size: 16px; font-weight: 700; }
+    .nft-owner { display: flex; align-items: center; gap: 0.5rem; }
+    .nft-owner .owner-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--gradient-primary); }
+    .nft-owner .owner-name { font-size: 12px; color: var(--text-secondary); }
+
+    .nft-actions { padding: 0 1rem 1rem; display: flex; gap: 0.5rem; }
+
+    /* Collection Sections */
+    .collections-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .collection-card { padding: 0; overflow: hidden; cursor: pointer; }
+    .collection-card:hover { transform: translateY(-4px); box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+    .collection-banner { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .collection-banner img { width: 100%; height: 100%; object-fit: cover; }
+    .collection-banner .collection-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(5,5,8,0.9) 100%); }
+    .collection-banner .collection-title-overlay { position: absolute; bottom: 1rem; left: 1.25rem; z-index: 2; }
+    .collection-banner .collection-title-overlay h3 { font-size: 20px; font-weight: 700; }
+    .collection-banner .collection-title-overlay p { font-size: 12px; color: var(--text-secondary); }
+    .collection-stats { padding: 1rem 1.25rem; display: flex; justify-content: space-between; }
+    .collection-stat { text-align: center; }
+    .collection-stat .cs-value { display: block; font-size: 15px; font-weight: 700; }
+    .collection-stat .cs-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .back-btn { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; margin-bottom: 1.5rem; cursor: pointer; border: none; background: none; font-family: inherit; }
+    .back-btn:hover { color: var(--text-primary); }
+
+    /* List NFT Modal */
+    .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 2rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .modal-header h3 { font-size: 20px; font-weight: 600; }
+    .modal-close { background: transparent; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer; padding: 4px; }
+    .modal-close:hover { color: var(--text-primary); }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-md); font-family: inherit; font-size: 14px; color: var(--text-primary); transition: all 0.15s; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-tertiary); }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+    .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+    .form-group select option { background: #0a0a0f; color: var(--text-primary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* Toast */
+    .toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; }
+    .toast { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; background: rgba(10,10,15,0.95); border: 1px solid var(--glass-border); border-radius: var(--radius-md); backdrop-filter: blur(20px); transform: translateX(150%); transition: transform 0.3s; margin-top: 0.5rem; font-size: 14px; }
+    .toast.show { transform: translateX(0); }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+
+    /* Footer */
+    footer { text-align: center; padding: 2rem; border-top: 1px solid var(--glass-border); margin-top: 3rem; }
+    footer p { font-size: 13px; color: var(--text-tertiary); }
+    footer a { color: var(--accent-primary); text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      main { padding: 90px 1rem 2rem; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .nft-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .collections-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Mobile hamburger menu */
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; z-index: 200; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text-primary); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+    .mobile-nav { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5,5,8,0.95); backdrop-filter: blur(20px); z-index: 150; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { color: var(--text-primary); text-decoration: none; font-size: 20px; font-weight: 500; padding: 0.5rem 2rem; transition: color 0.15s; }
+    .mobile-nav a:hover, .mobile-nav a.active { color: var(--accent-primary); }
+    @media (max-width: 900px) { .hamburger { display: block; } }
+  </style>
+<script>if(!localStorage.getItem("moltgrid_wallet")){window.location.href="index.html";}</script></head>
+<body>
+  <div class="ambient">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-mark"><img src="Molt2.png" alt="MoltGrid" style="width:100%;height:100%;object-fit:cover;"></div>
+        <span class="logo-text">MoltGrid</span>
+      </a>
+      <div class="nav-links">
+        <a href="feed.html">Signal</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html" class="active">Marketplace</a>
+        <a href="names.html">.X1 Names</a>
+        <a href="games.html">Gaming</a>
+        <a href="reputation.html">Reputation</a>
+        <a href="community.html">Community</a>
+      </div>
+      <button class="hamburger" onclick="document.querySelector('.mobile-nav').classList.toggle('open');this.classList.toggle('active')"><span></span><span></span><span></span></button>
+      <div class="nav-actions" id="navActions">
+        
+      </div>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+        <a href="feed.html">Signal</a>
+        <a href="services.html">Services</a>
+        <a href="marketplace.html" class="active">Marketplace</a>
+        <a href="names.html">.X1 Names</a>
+        <a href="names.html">.X1 Names</a>
+    <a href="games.html">Gaming</a>
+        <a href="reputation.html">Reputation</a>
+        <a href="community.html">Community</a>
+  </div>
+
+  <main>
+    <div class="market-hero glass-card">
+      <div class="badge">⛓️ X1 Blockchain • NFT Marketplace</div>
+      <h1>NFT Marketplace</h1>
+      <p>Buy, sell, and trade NFTs on X1 — pay in XNT, AGI, or X1X. Connect your wallet to see your collection or browse listings.</p>
+    </div>
+
+    <!-- Marketplace Tabs -->
+    <div style="display:flex;gap:0.5rem;margin-bottom:2rem;">
+      <button class="filter-tab active" id="tabForSale" onclick="showTab('forSale')">🏷️ For Sale</button>
+      <button class="filter-tab" id="tabMyCollection" onclick="showTab('myCollection')">👛 My Collection</button>
+    </div>
+
+    <!-- FOR SALE TAB -->
+    <div id="forSaleView">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h2 style="font-size:22px;font-weight:700;">Listed for Sale</h2>
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Search listings..." id="searchListings">
+        </div>
+      </div>
+      <div class="nft-grid" id="listingsGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);">
+          <p style="font-size:2rem;margin-bottom:1rem;">🏷️</p>
+          <p>No NFTs listed for sale yet. Connect your wallet and list the first one!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY COLLECTION TAB -->
+    <div id="myCollectionView" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h2 style="font-size:22px;font-weight:700;">My Collection</h2>
+        <button class="btn btn-ghost" onclick="loadMyNFTs()" id="refreshBtn">🔄 Refresh</button>
+      </div>
+      
+      <div id="myNftsContainer">
+        <div class="glass-card" style="padding:3rem;text-align:center;color:var(--text-tertiary);" id="connectPrompt">
+          <p style="font-size:2rem;margin-bottom:1rem;">👛</p>
+          <p>Connect your wallet to see your NFT collection</p>
+          <button class="btn btn-primary" style="margin-top:1rem;" onclick="connectWallet()">Connect Wallet</button>
+        </div>
+        <div class="nft-grid" id="myNftsGrid" style="display:none;"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- List for Sale Modal -->
+  <div class="modal-overlay" id="listModal" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:2rem;">
+    <div class="glass-card" style="max-width:480px;width:100%;padding:2rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+        <h3 style="font-size:20px;font-weight:600;">List NFT for Sale</h3>
+        <button onclick="document.getElementById('listModal').style.display='none'" style="background:none;border:1px solid var(--glass-border);border-radius:50%;width:32px;height:32px;color:var(--text-secondary);font-size:20px;cursor:pointer;">×</button>
+      </div>
+      <div style="padding:1rem;background:rgba(0,0,0,0.2);border-radius:var(--radius-md);border:1px solid var(--glass-border);margin-bottom:1.5rem;">
+        <div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">NFT</div>
+        <div style="font-size:16px;font-weight:600;" id="listNftName">—</div>
+        <div style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);margin-top:4px;" id="listMint">—</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Price *</label>
+          <input type="number" id="listPrice" placeholder="0.0" step="0.01" min="0.01" style="width:100%;padding:12px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:var(--radius-md);font-family:inherit;font-size:14px;color:var(--text-primary);">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Currency *</label>
+          <select id="listCurrency" style="width:100%;padding:12px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:var(--radius-md);font-family:inherit;font-size:14px;color:var(--text-primary);appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 16px center;">
+            <option value="XNT" style="background:#0a0a0f;">XNT (Native)</option>
+            <option value="AGI" style="background:#0a0a0f;">AGI Token</option>
+            <option value="X1X" style="background:#0a0a0f;">X1X Token</option>
+          </select>
+        </div>
+      </div>
+      <div style="padding:0.75rem;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-md);margin-bottom:1.5rem;font-size:12px;color:var(--text-secondary);">
+        <strong style="color:var(--text-primary);">How it works:</strong> Your NFT is held in escrow by the marketplace contract. When someone buys it, payment goes to your wallet and the NFT transfers to the buyer. You can cancel anytime. Supports XNT, AGI, and X1X payments.
+        <br><br>
+        <span style="font-size:11px;color:var(--text-tertiary);">Contract: <a href="https://explorer.x1.xyz/address/CfEqwquzkkCq4J9ju3drsnxaAYMUfvLV8rDqhRNWrJYb" target="_blank" style="color:var(--accent-primary);">CfEq...rJYb</a></span>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="confirmListBtn" onclick="confirmList()">Sign & List for Sale</button>
+    </div>
+  </div>
+
+  <!-- Buy NFT Modal -->
+  <div class="modal-overlay" id="buyModal" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:2rem;">
+    <div class="glass-card" style="max-width:480px;width:100%;padding:2rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+        <h3 style="font-size:20px;font-weight:600;">Buy NFT</h3>
+        <button onclick="document.getElementById('buyModal').style.display='none'" style="background:none;border:1px solid var(--glass-border);border-radius:50%;width:32px;height:32px;color:var(--text-secondary);font-size:20px;cursor:pointer;">×</button>
+      </div>
+      <div style="padding:1rem;background:rgba(0,0,0,0.2);border-radius:var(--radius-md);border:1px solid var(--glass-border);margin-bottom:1rem;">
+        <div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px;">NFT</div>
+        <div style="font-size:16px;font-weight:600;" id="buyNftName">—</div>
+        <div style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);margin-top:4px;" id="buyMint">—</div>
+      </div>
+      <div style="padding:1.5rem;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-md);margin-bottom:1.5rem;text-align:center;">
+        <div style="font-size:12px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px;">Price</div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent-primary);" id="buyPrice">— XNT</div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">Seller: <span id="buySeller">—</span></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="confirmBuyBtn" onclick="confirmBuy()">Sign & Buy Now</button>
+    </div>
+  </div>
+
+  <footer>
+    <p><a href="index.html">MoltGrid</a> — NFT Marketplace on X1 Blockchain</p>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  <script src="https://bundle.run/buffer@6.0.3"></script>
+  <script>window.Buffer = window.buffer.Buffer;</script>
+  <script>
+    const MARKETPLACE_PROGRAM_ID = 'CfEqwquzkkCq4J9ju3drsnxaAYMUfvLV8rDqhRNWrJYb';
+    const X1_RPC = 'https://rpc.mainnet.x1.xyz';
+    const SOL_RPC = 'https://api.mainnet-beta.solana.com';
+    const TOKEN_PROGRAM_ID_STR = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
+    const ASSOC_TOKEN_PROGRAM_STR = 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL';
+
+    // Payment currencies
+    const CURRENCIES = {
+      XNT: { mint: null, symbol: 'XNT', decimals: 9, label: 'XNT (Native)', color: '#10b981' },
+      AGI: { mint: '7SXmUpcBGSAwW5LmtzQVF9jHswZ7xzmdKqWa4nDgL3ER', symbol: 'AGI', decimals: 9, label: 'AGI Token', color: '#f59e0b' },
+      X1X: { mint: '7z2PRr3SXJsVpvpqSnvMphjbwpWgigFXpXoozqjc3N46', symbol: 'X1X', decimals: 9, label: 'X1X Token', color: '#8b5cf6' },
+    };
+    const NATIVE_SENTINEL = '11111111111111111111111111111111'; // SystemProgram = native XNT
+
+    // Memo Program — adds readable label to transactions shown in wallet
+    const MEMO_PROGRAM_ID = new solanaWeb3.PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+    function makeMemo(text, signer) {
+      return new solanaWeb3.TransactionInstruction({
+        programId: MEMO_PROGRAM_ID,
+        keys: signer ? [{ pubkey: signer, isSigner: true, isWritable: false }] : [],
+        data: Buffer.from(text, 'utf-8'),
+      });
+    }
+
+    // Friendly error messages
+    function friendlyError(msg) {
+      if (msg.includes('insufficient lamports')) {
+        const match = msg.match(/need (\d+)/);
+        const needed = match ? (parseInt(match[1]) / 1e9).toFixed(2) : '?';
+        return 'Not enough XNT in your wallet. You need at least ' + needed + ' XNT (including fees).';
+      }
+      if (msg.includes('ListingInactive')) return 'This listing is no longer active — it was cancelled or already sold.';
+      if (msg.includes('CannotBuyOwnNft')) return "You can't buy your own NFT!";
+      if (msg.includes('AlreadyListed')) return 'This NFT is already listed for sale.';
+      if (msg.includes('InvalidPrice')) return 'Price must be greater than 0.';
+      if (msg.includes('WrongPaymentType')) return 'Wrong payment type for this listing.';
+      if (msg.includes('WrongPaymentMint')) return 'Wrong payment token for this listing.';
+      if (msg.includes('User rejected')) return 'Transaction cancelled.';
+      if (msg.includes('0x1')) return 'Insufficient funds for this transaction.';
+      return msg.length > 120 ? msg.slice(0, 120) + '...' : msg;
+    }
+
+    // Sanitize image URLs — replace blocked domains with local fallbacks
+    function safeImageUrl(url) {
+      if (!url) return null;
+      return url;
+    }
+
+    let myNfts = [];
+    let activeListings = [];
+    let pendingListMint = null;
+    let pendingBuy = null;
+
+    // === TAB SWITCHING ===
+    function showTab(tab) {
+      document.getElementById('forSaleView').style.display = tab === 'forSale' ? 'block' : 'none';
+      document.getElementById('myCollectionView').style.display = tab === 'myCollection' ? 'block' : 'none';
+      document.getElementById('tabForSale').classList.toggle('active', tab === 'forSale');
+      document.getElementById('tabMyCollection').classList.toggle('active', tab === 'myCollection');
+      if (tab === 'myCollection') loadMyNFTs();
+    }
+
+    // === MY COLLECTION: Scan wallet for NFTs ===
+    async function loadMyNFTs() {
+      const wallet = localStorage.getItem('moltgrid_wallet');
+      if (!wallet) return;
+
+      document.getElementById('connectPrompt').style.display = 'none';
+      document.getElementById('myNftsGrid').style.display = 'grid';
+      document.getElementById('myNftsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);">Scanning your wallet for NFTs...</div>';
+
+      try {
+        const connection = new solanaWeb3.Connection(X1_RPC, 'confirmed');
+        const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID_STR);
+
+        // Get all token accounts for this wallet
+        const res = await fetch(X1_RPC, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', id: 1,
+            method: 'getTokenAccountsByOwner',
+            params: [wallet, { programId: TOKEN_PROGRAM_ID_STR }, { encoding: 'jsonParsed' }]
+          })
+        });
+        const data = await res.json();
+        const accounts = data?.result?.value || [];
+
+        // Filter for NFTs (amount=1, decimals=0)
+        myNfts = accounts
+          .map(a => a.account?.data?.parsed?.info)
+          .filter(info => info && info.tokenAmount?.uiAmount === 1 && info.tokenAmount?.decimals === 0)
+          .map(info => ({
+            mint: info.mint,
+            name: info.mint.slice(0, 6) + '...' + info.mint.slice(-4),
+            owner: wallet,
+            isFrozen: info.state === 'frozen'
+          }));
+
+        // Also scan Solana mainnet for NFTs (same wallet address)
+        try {
+          const solRes = await fetch(SOL_RPC, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0', id: 2,
+              method: 'getTokenAccountsByOwner',
+              params: [wallet, { programId: TOKEN_PROGRAM_ID_STR }, { encoding: 'jsonParsed' }]
+            })
+          });
+          const solData = await solRes.json();
+          const solAccounts = solData?.result?.value || [];
+          const solNfts = solAccounts
+            .map(a => a.account?.data?.parsed?.info)
+            .filter(info => info && info.tokenAmount?.uiAmount === 1 && info.tokenAmount?.decimals === 0)
+            .filter(info => !myNfts.find(n => n.mint === info.mint)) // exclude duplicates
+            .map(info => ({
+              mint: info.mint,
+              name: info.mint.slice(0, 6) + '...' + info.mint.slice(-4),
+              owner: wallet,
+              chain: 'SOL'
+            }));
+          myNfts.push(...solNfts);
+        } catch(e) { console.error('Solana scan failed:', e); }
+
+        // Check which of my NFTs are currently listed (in escrow)
+        let listedMints = new Set();
+        try {
+          const listRes = await fetch(X1_RPC, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'getProgramAccounts',
+              params: [MARKETPLACE_PROGRAM_ID, { encoding: 'base64', filters: [{ dataSize: 123 }] }] }) });
+          const listData = await listRes.json();
+          for (const acc of (listData?.result || [])) {
+            const raw = Uint8Array.from(atob(acc.account.data[0]), c => c.charCodeAt(0));
+            const seller = new solanaWeb3.PublicKey(raw.slice(8, 40)).toString();
+            const mint = new solanaWeb3.PublicKey(raw.slice(40, 72)).toString();
+            const isActive = raw[112] === 1;
+            if (isActive && seller === wallet) {
+              listedMints.add(mint);
+              const priceVal = Number(new DataView(raw.buffer).getBigUint64(72, true)) / 1e9;
+              const pmint = new solanaWeb3.PublicKey(raw.slice(80, 112)).toString();
+              let cur = 'XNT';
+              if (pmint === CURRENCIES.AGI.mint) cur = 'AGI';
+              else if (pmint === CURRENCIES.X1X.mint) cur = 'X1X';
+              // Add to myNfts so it shows up in My Collection
+              if (!myNfts.find(n => n.mint === mint)) {
+                myNfts.unshift({ mint, name: mint.slice(0,6) + '...' + mint.slice(-4), owner: wallet, isListed: true,
+                  price: priceVal, currency: cur });
+              }
+            }
+          }
+        } catch(e) { console.error('Failed to check listings:', e); }
+
+        // Mark listed NFTs
+        for (let nft of myNfts) {
+          if (listedMints.has(nft.mint)) nft.isListed = true;
+        }
+
+        if (myNfts.length === 0) {
+          document.getElementById('myNftsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);"><p style="font-size:2rem;margin-bottom:1rem;">📭</p><p>No NFTs found in your wallet</p></div>';
+          return;
+        }
+
+        // Render immediately with basic info, then enrich in background
+        renderMyNFTs();
+        enrichMyNfts(wallet);
+      
+      } catch (err) {
+        console.error('Failed to load NFTs:', err);
+        document.getElementById('myNftsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);">Failed to scan wallet. Try again.</div>';
+      }
+    }
+
+    async function enrichMyNfts(wallet) {
+      // Fetch AgentID + X1 Punks in parallel (one call each, not per-NFT)
+      const [agentData, punkData] = await Promise.all([
+        fetch('https://agentid-app.vercel.app/api/verify?wallet=' + wallet).then(r => r.json()).catch(() => null),
+        fetch('https://x1punks.xyz/api/mints').then(r => r.json()).catch(() => null)
+      ]);
+      const punkMints = punkData?.mints || [];
+      let changed = false;
+      for (let nft of myNfts) {
+        if (agentData?.verified && agentData.nft?.mint === nft.mint) {
+          nft.name = agentData.agent.name + ' AgentID';
+          nft.image = safeImageUrl(agentData.agent.photoUrl);
+          nft.isAgentID = true;
+          nft.isSoulbound = agentData.nft?.soulbound || nft.isFrozen || false;
+          changed = true;
+        }
+        const punk = punkMints.find(p => p.mintAddress === nft.mint);
+        if (punk) {
+          nft.name = punk.name;
+          nft.image = safeImageUrl(punk.imageUrl || 'https://x1punks.xyz/generated/punk_' + punk.id + '.png');
+          nft.isPunk = true;
+          changed = true;
+        }
+      }
+      if (changed) renderMyNFTs();
+
+      // Enrich Solana NFTs — try to fetch on-chain metadata
+      const solNfts = myNfts.filter(n => n.chain === 'SOL' && !n.image);
+      if (solNfts.length > 0) {
+        const METADATA_PROGRAM = 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s';
+        for (const nft of solNfts.slice(0, 10)) { // limit to 10
+          try {
+            // Derive metadata PDA: seeds = ['metadata', metadata_program, mint]
+            const metaPDA = (await solanaWeb3.PublicKey.findProgramAddress(
+              [Buffer.from('metadata'), new solanaWeb3.PublicKey(METADATA_PROGRAM).toBuffer(), new solanaWeb3.PublicKey(nft.mint).toBuffer()],
+              new solanaWeb3.PublicKey(METADATA_PROGRAM)
+            ))[0];
+            const accRes = await fetch(SOL_RPC, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ jsonrpc: '2.0', id: 50, method: 'getAccountInfo', params: [metaPDA.toString(), { encoding: 'base64' }] }) });
+            const accData = await accRes.json();
+            const raw = accData?.result?.value?.data?.[0];
+            if (raw) {
+              const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+              // Metaplex metadata: name starts at byte 65, 32 bytes max (4-byte length prefix at 65)
+              const nameLen = bytes[65] | (bytes[66] << 8) | (bytes[67] << 16) | (bytes[68] << 24);
+              const name = new TextDecoder().decode(bytes.slice(69, 69 + Math.min(nameLen, 32))).replace(/\0/g, '').trim();
+              // URI starts after name + symbol
+              const symLen = bytes[69 + nameLen] | (bytes[70 + nameLen] << 8) | (bytes[71 + nameLen] << 16) | (bytes[72 + nameLen] << 24);
+              const uriOffset = 73 + nameLen + symLen;
+              const uriLen = bytes[uriOffset] | (bytes[uriOffset+1] << 8) | (bytes[uriOffset+2] << 16) | (bytes[uriOffset+3] << 24);
+              const uri = new TextDecoder().decode(bytes.slice(uriOffset + 4, uriOffset + 4 + Math.min(uriLen, 200))).replace(/\0/g, '').trim();
+
+              if (name) { nft.name = name; changed = true; }
+              // Try to fetch JSON metadata for image
+              if (uri && (uri.startsWith('http') || uri.startsWith('ipfs'))) {
+                try {
+                  const metaUrl = uri.startsWith('ipfs') ? uri.replace('ipfs://', 'https://nftstorage.link/ipfs/') : uri;
+                  const jsonRes = await fetch(metaUrl);
+                  const jsonMeta = await jsonRes.json();
+                  if (jsonMeta.image) {
+                    nft.image = jsonMeta.image.startsWith('ipfs') ? jsonMeta.image.replace('ipfs://', 'https://nftstorage.link/ipfs/') : jsonMeta.image;
+                    changed = true;
+                  }
+                  if (jsonMeta.collection?.name) nft.collection = jsonMeta.collection.name;
+                } catch(e) {}
+              }
+            }
+          } catch(e) { continue; }
+        }
+        if (changed) renderMyNFTs();
+      }
+    }
+
+    function renderListings() {
+      const grid = document.getElementById('listingsGrid');
+      const currColors = { XNT: '#10b981', AGI: '#f59e0b', X1X: '#8b5cf6' };
+      grid.innerHTML = activeListings.map(l => `
+        <div class="nft-card glass-card">
+          <div class="nft-image">
+            ${l.image ? '<img src="' + l.image + '" alt="' + l.name + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">' : ''}<span class="placeholder-icon" style="${l.image ? 'display:none' : ''}">🎨</span>
+            <span class="nft-chain-badge">X1</span>
+          </div>
+          <div class="nft-info">
+            <div class="nft-collection">${l.collection || 'Listed by ' + l.sellerShort}</div>
+            <div class="nft-name">${l.name}</div>
+            <div class="nft-price-row">
+              <div class="nft-price">
+                <span class="label">Price</span>
+                <span class="value" style="color:${currColors[l.currencySymbol] || 'var(--accent-primary)'};">${l.price} ${l.currencySymbol}</span>
+              </div>
+            </div>
+          </div>
+          <div class="nft-actions">
+            <button class="btn btn-primary btn-sm" style="flex:1;font-size:12px;" onclick="buyNFT('${l.nftMint}','${l.name}',${l.price},'${l.seller}','${l.currencySymbol}','${l.paymentMint}')">Buy Now</button>
+            <a href="https://explorer.x1.xyz/address/${l.nftMint}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;font-size:12px;text-decoration:none;text-align:center;">Explorer</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function enrichListings() {
+      if (activeListings.length === 0) return;
+      // Fetch all data sources in parallel (one call each)
+      const sellerWallets = [...new Set(activeListings.map(l => l.seller))];
+      const [punkData, ...agentResults] = await Promise.all([
+        fetch('https://x1punks.xyz/api/mints').then(r => r.json()).catch(() => null),
+        ...sellerWallets.map(w => fetch('https://agentid-app.vercel.app/api/verify?wallet=' + w).then(r => r.json()).catch(() => null))
+      ]);
+      const agentMap = {};
+      sellerWallets.forEach((w, i) => { if (agentResults[i]?.verified) agentMap[w] = agentResults[i]; });
+      const punkMints = punkData?.mints || [];
+      let changed = false;
+      for (let l of activeListings) {
+        const agent = agentMap[l.seller];
+        if (agent && agent.nft?.mint === l.nftMint) {
+          l.name = agent.agent.name + ' AgentID';
+          l.image = safeImageUrl(agent.agent.photoUrl);
+          l.collection = 'AgentID';
+          changed = true;
+        }
+        if (!l.image) {
+          const punk = punkMints.find(p => p.mintAddress === l.nftMint);
+          if (punk) { l.name = punk.name; l.image = safeImageUrl(punk.imageUrl || 'https://x1punks.xyz/generated/punk_' + punk.id + '.png'); l.collection = 'X1 Punks'; changed = true; }
+        }
+      }
+      if (changed) renderListings();
+    }
+
+    function renderMyNFTs() {
+      const grid = document.getElementById('myNftsGrid');
+      // Listed first, then X1, then SOL
+      myNfts.sort((a, b) => {
+        if (a.isListed !== b.isListed) return b.isListed ? 1 : -1;
+        if (a.chain !== b.chain) return (a.chain === 'SOL' ? 1 : -1);
+        return 0;
+      });
+      grid.innerHTML = myNfts.map(nft => {
+        const isSol = nft.chain === 'SOL';
+        const explorer = isSol ? 'https://solscan.io/token/' + nft.mint : 'https://explorer.x1.xyz/address/' + nft.mint;
+        const chainBadge = isSol ? 'SOL' : 'X1';
+        const chainColor = isSol ? 'background:linear-gradient(135deg,#9945FF,#14F195);' : '';
+
+        let actions;
+        if (nft.isSoulbound) {
+          actions = '<div style="flex:1;text-align:center;padding:6px;font-size:11px;color:#818cf8;background:rgba(99,102,241,0.1);border-radius:8px;font-weight:600;letter-spacing:0.5px;">🔒 SOULBOUND — Non-Transferable</div>';
+        } else if (nft.isListed) {
+          actions = '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:12px;color:var(--error);" onclick="cancelListing(\'' + nft.mint + '\')">Cancel Listing</button>';
+        } else if (isSol) {
+          actions = '<a href="https://magiceden.io/item-details/' + nft.mint + '" target="_blank" class="btn btn-primary btn-sm" style="flex:1;font-size:12px;text-decoration:none;text-align:center;">Trade on ME</a>' +
+                    '<a href="https://tensor.trade/item/' + nft.mint + '" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;font-size:12px;text-decoration:none;text-align:center;">Tensor</a>';
+        } else {
+          actions = '<button class="btn btn-primary btn-sm" style="flex:1;font-size:12px;" onclick="listForSale(\'' + nft.mint + "','" + nft.name.replace(/'/g, '') + '\')">List</button>' +
+                    '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:12px;" onclick="transferNft(\'' + nft.mint + "','" + nft.name.replace(/'/g, '') + '\')">Transfer</button>';
+        }
+
+        return '<div class="nft-card glass-card">' +
+          '<div class="nft-image">' +
+            (nft.image ? '<img src="' + nft.image + '" alt="' + nft.name + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">' : '') +
+            '<span class="placeholder-icon" style="' + (nft.image ? 'display:none' : '') + '">🎨</span>' +
+            '<span class="nft-chain-badge" style="' + chainColor + '">' + chainBadge + '</span>' +
+          '</div>' +
+          '<div class="nft-info">' +
+            '<div class="nft-collection">' + (nft.collection || (nft.isPunk ? 'X1 Punks' : nft.isAgentID ? 'AgentID' : isSol ? 'Solana NFT' : 'X1 NFT')) + '</div>' +
+            '<div class="nft-name">' + nft.name + '</div>' +
+            '<div class="nft-price-row"><div class="nft-price">' +
+              '<span class="label">Status</span>' +
+              '<span class="value" style="color:' + (nft.isListed ? 'var(--accent-primary)' : 'var(--success)') + ';">' +
+                (nft.isListed ? '🏷️ Listed' + (nft.price ? ' · ' + nft.price + ' ' + (nft.currency || 'XNT') : '') : '✓ Owned') +
+              '</span>' +
+            '</div></div>' +
+          '</div>' +
+          '<div class="nft-actions">' + actions +
+            '<a href="' + explorer + '" target="_blank" class="btn btn-ghost btn-sm" style="font-size:12px;text-decoration:none;text-align:center;padding:8px;">🔗</a>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // === LIST FOR SALE ===
+    function listForSale(mint, name) {
+      const saved = localStorage.getItem('moltgrid_wallet');
+      if (!saved) { showToast('Connect your wallet first', 'error'); return; }
+      pendingListMint = mint;
+      document.getElementById('listNftName').textContent = name;
+      document.getElementById('listMint').textContent = mint;
+      document.getElementById('listPrice').value = '';
+      document.getElementById('listModal').style.display = 'flex';
+    }
+
+    async function confirmList() {
+      const price = parseFloat(document.getElementById('listPrice').value);
+      const currency = document.getElementById('listCurrency').value;
+      if (!price || price <= 0) { showToast('Enter a valid price', 'error'); return; }
+      const btn = document.getElementById('confirmListBtn');
+      btn.textContent = 'Preparing...'; btn.disabled = true;
+
+      try {
+        const provider = window.x1 || window.backpack || (window.solana && !window.solana.isBraveWallet && !window.solana.isPhantom ? window.solana : null);
+        if (!provider?.publicKey) await provider.connect();
+        const connection = new solanaWeb3.Connection(X1_RPC, 'confirmed');
+        const seller = provider.publicKey;
+        const mintPubkey = new solanaWeb3.PublicKey(pendingListMint);
+        const programId = new solanaWeb3.PublicKey(MARKETPLACE_PROGRAM_ID);
+        const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID_STR);
+        const ASSOC = new solanaWeb3.PublicKey(ASSOC_TOKEN_PROGRAM_STR);
+
+        // Payment mint: native XNT uses SystemProgram as sentinel, SPL tokens use their mint
+        const paymentMintStr = CURRENCIES[currency].mint || NATIVE_SENTINEL;
+        const paymentMintPubkey = new solanaWeb3.PublicKey(paymentMintStr);
+
+        const [listingPDA] = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from('listing'), mintPubkey.toBuffer()], programId);
+        const [escrowPDA] = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from('escrow'), mintPubkey.toBuffer()], programId);
+        const sellerATA = solanaWeb3.PublicKey.findProgramAddressSync([seller.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintPubkey.toBuffer()], ASSOC)[0];
+
+        // Instruction data: 8-byte discriminator + 8-byte price + 32-byte payment_mint
+        const priceLamports = BigInt(Math.round(price * 1e9));
+        const data = Buffer.alloc(48);
+        data.set(new Uint8Array([88, 221, 93, 166, 63, 220, 106, 232]), 0); // list_nft discriminator
+        data.writeBigUInt64LE(priceLamports, 8);
+        data.set(paymentMintPubkey.toBytes(), 16);
+
+        const keys = [
+          { pubkey: seller, isSigner: true, isWritable: true },
+          { pubkey: mintPubkey, isSigner: false, isWritable: false },
+          { pubkey: sellerATA, isSigner: false, isWritable: true },
+          { pubkey: escrowPDA, isSigner: false, isWritable: true },
+          { pubkey: listingPDA, isSigner: false, isWritable: true },
+          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+        ];
+
+        const memo = makeMemo('MoltGrid Marketplace: List NFT for ' + price + ' ' + currency, seller);
+        const tx = new solanaWeb3.Transaction().add(memo).add(new solanaWeb3.TransactionInstruction({ keys, programId, data }));
+        tx.feePayer = seller;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+        btn.textContent = 'Sign in wallet...';
+        const signed = await provider.signTransaction(tx);
+        btn.textContent = 'Sending...';
+        const sig = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(sig, 'confirmed');
+
+        showToast('Listed for ' + price + ' ' + currency + '!', 'success');
+        document.getElementById('listModal').style.display = 'none';
+
+        // Optimistic UI: mark NFT as listed immediately
+        const listedNft = myNfts.find(n => n.mint === pendingListMint);
+        if (listedNft) {
+          listedNft.isListed = true;
+          listedNft.price = price;
+          listedNft.currency = currency;
+        }
+        activeListings.push({
+          seller: seller.toString(),
+          nftMint: pendingListMint,
+          price,
+          currencySymbol: currency,
+          name: listedNft?.name || pendingListMint.slice(0,6)+'...'+pendingListMint.slice(-4),
+          image: listedNft?.image,
+          sellerShort: seller.toString().slice(0,6)+'...'+seller.toString().slice(-4),
+        });
+        renderMyNFTs();
+        renderListings();
+        showTab('forSale');
+        // Single quiet refresh after RPC indexes
+        setTimeout(() => { loadListings(); loadMyNFTs(); }, 3000);
+      } catch (err) {
+        console.error('List failed:', err);
+        showToast(friendlyError(err.message || 'Rejected'), 'error');
+      }
+      btn.textContent = 'Sign & List for Sale'; btn.disabled = false;
+    }
+
+    // === FOR SALE: Load active listings from on-chain ===
+    async function loadListings() {
+      const grid = document.getElementById('listingsGrid');
+      try {
+        const programId = new solanaWeb3.PublicKey(MARKETPLACE_PROGRAM_ID);
+        // Fetch all program accounts (listings)
+        // Fetch listing accounts (8 discriminator + 115 data = 123 bytes)
+        const res = await fetch(X1_RPC, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getProgramAccounts',
+            params: [MARKETPLACE_PROGRAM_ID, { encoding: 'base64', filters: [{ dataSize: 123 }] }] }) });
+        const resData = await res.json();
+        const accounts = resData?.result || [];
+
+        if (accounts.length === 0) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);"><p style="font-size:2rem;margin-bottom:1rem;">🏷️</p><p>No NFTs listed for sale yet. Be the first — list from My Collection!</p></div>';
+          return;
+        }
+
+        // Parse listing accounts
+        // Layout: 8 disc + 32 seller + 32 nft_mint + 8 price + 32 payment_mint + 1 is_active + 8 created_at + 1 bump + 1 escrow_bump = 123
+        const listings = [];
+        for (const acc of accounts) {
+          try {
+            const raw = Uint8Array.from(atob(acc.account.data[0]), c => c.charCodeAt(0));
+            const seller = new solanaWeb3.PublicKey(raw.slice(8, 40)).toString();
+            const nftMint = new solanaWeb3.PublicKey(raw.slice(40, 72)).toString();
+            const price = Number(new DataView(raw.buffer).getBigUint64(72, true)) / 1e9;
+            const paymentMint = new solanaWeb3.PublicKey(raw.slice(80, 112)).toString();
+            const isActive = raw[112] === 1;
+
+            // Resolve currency symbol
+            let currencySymbol = 'XNT';
+            if (paymentMint === NATIVE_SENTINEL) { currencySymbol = 'XNT'; }
+            else if (paymentMint === CURRENCIES.AGI.mint) { currencySymbol = 'AGI'; }
+            else if (paymentMint === CURRENCIES.X1X.mint) { currencySymbol = 'X1X'; }
+            else { currencySymbol = paymentMint.slice(0,4) + '..'; }
+
+            if (isActive) {
+              listings.push({ pda: acc.pubkey, seller, nftMint, price, paymentMint, currencySymbol });
+            }
+          } catch(e) { continue; }
+        }
+
+        if (listings.length === 0) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);"><p style="font-size:2rem;margin-bottom:1rem;">🏷️</p><p>No active listings right now.</p></div>';
+          return;
+        }
+
+        // Set basic names immediately
+        for (let l of listings) {
+          l.name = l.nftMint.slice(0,6) + '...' + l.nftMint.slice(-4);
+          l.sellerShort = l.seller.slice(0,6) + '...' + l.seller.slice(-4);
+        }
+
+        activeListings = listings;
+        renderListings();
+        // Enrich in background
+        enrichListings();
+      } catch (err) {
+        console.error('Failed to load listings:', err);
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-tertiary);">Failed to load listings</div>';
+      }
+    }
+
+    // === BUY NFT ===
+    function buyNFT(mint, name, price, seller, currencySymbol, paymentMint) {
+      const saved = localStorage.getItem('moltgrid_wallet');
+      if (!saved) { showToast('Connect your wallet first', 'error'); return; }
+      if (saved === seller) { showToast("That's your own listing!", 'error'); return; }
+      pendingBuy = { mint, name, price, seller, currencySymbol, paymentMint };
+      document.getElementById('buyNftName').textContent = name;
+      document.getElementById('buyMint').textContent = mint;
+      const currColor = { XNT: '#10b981', AGI: '#f59e0b', X1X: '#8b5cf6' }[currencySymbol] || 'var(--accent-primary)';
+      document.getElementById('buyPrice').innerHTML = price + ' <span style="color:' + currColor + '">' + currencySymbol + '</span>';
+      document.getElementById('buySeller').textContent = seller.slice(0,6) + '...' + seller.slice(-4);
+      document.getElementById('buyModal').style.display = 'flex';
+    }
+
+    async function confirmBuy() {
+      if (!pendingBuy) return;
+      const btn = document.getElementById('confirmBuyBtn');
+      btn.textContent = 'Preparing...'; btn.disabled = true;
+
+      try {
+        const provider = window.x1 || window.backpack || (window.solana && !window.solana.isBraveWallet && !window.solana.isPhantom ? window.solana : null);
+        if (!provider?.publicKey) await provider.connect();
+        const connection = new solanaWeb3.Connection(X1_RPC, 'confirmed');
+        const buyer = provider.publicKey;
+        const mintPubkey = new solanaWeb3.PublicKey(pendingBuy.mint);
+        const sellerPubkey = new solanaWeb3.PublicKey(pendingBuy.seller);
+        const programId = new solanaWeb3.PublicKey(MARKETPLACE_PROGRAM_ID);
+        const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID_STR);
+        const ASSOC = new solanaWeb3.PublicKey(ASSOC_TOKEN_PROGRAM_STR);
+
+        const [listingPDA] = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from('listing'), mintPubkey.toBuffer()], programId);
+        const [escrowPDA] = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from('escrow'), mintPubkey.toBuffer()], programId);
+        const buyerATA = solanaWeb3.PublicKey.findProgramAddressSync([buyer.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintPubkey.toBuffer()], ASSOC)[0];
+
+        const isNativePayment = pendingBuy.paymentMint === NATIVE_SENTINEL;
+        const paymentMintPubkey = new solanaWeb3.PublicKey(pendingBuy.paymentMint);
+
+        let keys, data;
+
+        if (isNativePayment) {
+          // buy_nft — native XNT payment
+          data = Buffer.from([96, 0, 28, 190, 49, 107, 83, 222]); // buy_nft discriminator
+          keys = [
+            { pubkey: buyer, isSigner: true, isWritable: true },
+            { pubkey: sellerPubkey, isSigner: false, isWritable: true },
+            { pubkey: mintPubkey, isSigner: false, isWritable: false },
+            { pubkey: listingPDA, isSigner: false, isWritable: true },
+            { pubkey: escrowPDA, isSigner: false, isWritable: true },
+            { pubkey: buyerATA, isSigner: false, isWritable: true },
+            { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+            { pubkey: ASSOC, isSigner: false, isWritable: false },
+            { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
+            { pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+          ];
+        } else {
+          // buy_nft_token — SPL token payment (AGI/X1X)
+          // Discriminator for buy_nft_token: sha256("global:buy_nft_token")[0..8]
+          data = Buffer.from([33, 63, 119, 240, 112, 68, 60, 173]); // buy_nft_token discriminator
+          const buyerPayATA = solanaWeb3.PublicKey.findProgramAddressSync([buyer.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), paymentMintPubkey.toBuffer()], ASSOC)[0];
+          const sellerPayATA = solanaWeb3.PublicKey.findProgramAddressSync([sellerPubkey.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), paymentMintPubkey.toBuffer()], ASSOC)[0];
+          keys = [
+            { pubkey: buyer, isSigner: true, isWritable: true },
+            { pubkey: sellerPubkey, isSigner: false, isWritable: true },
+            { pubkey: mintPubkey, isSigner: false, isWritable: false },
+            { pubkey: paymentMintPubkey, isSigner: false, isWritable: false },
+            { pubkey: listingPDA, isSigner: false, isWritable: true },
+            { pubkey: escrowPDA, isSigner: false, isWritable: true },
+            { pubkey: buyerATA, isSigner: false, isWritable: true },
+            { pubkey: buyerPayATA, isSigner: false, isWritable: true },
+            { pubkey: sellerPayATA, isSigner: false, isWritable: true },
+            { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+            { pubkey: ASSOC, isSigner: false, isWritable: false },
+            { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
+            { pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+          ];
+        }
+
+        // Prevent buying your own NFT
+        if (buyer.toString() === pendingBuy.seller) {
+          showToast('You can\'t buy your own NFT!', 'error');
+          btn.textContent = 'Sign & Buy Now'; btn.disabled = false;
+          return;
+        }
+
+        const memo = makeMemo('MoltGrid Marketplace: Buy NFT for ' + pendingBuy.price + ' ' + pendingBuy.currencySymbol, buyer);
+        const tx = new solanaWeb3.Transaction().add(memo).add(new solanaWeb3.TransactionInstruction({ keys, programId, data }));
+        tx.feePayer = buyer;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+        btn.textContent = 'Sign in wallet...';
+        const signed = await provider.signTransaction(tx);
+        btn.textContent = 'Sending...';
+        const sig = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(sig, 'confirmed');
+
+        showToast('NFT purchased for ' + pendingBuy.price + ' ' + pendingBuy.currencySymbol + '! 🎉', 'success');
+        document.getElementById('buyModal').style.display = 'none';
+
+        // Optimistic UI: remove from listings, add to my collection
+        const boughtListing = activeListings.find(l => l.nftMint === pendingBuy.mint);
+        activeListings = activeListings.filter(l => l.nftMint !== pendingBuy.mint);
+        myNfts.push({
+          mint: pendingBuy.mint,
+          name: boughtListing?.name || pendingBuy.name,
+          image: boughtListing?.image,
+          owner: buyer.toString(),
+          isListed: false,
+        });
+        renderListings();
+        renderMyNFTs();
+        setTimeout(() => { loadListings(); loadMyNFTs(); }, 3000);
+      } catch (err) {
+        console.error('Buy failed:', err);
+        const msg = err.message || 'Rejected';
+        if (msg.includes('ListingInactive')) {
+          showToast('This listing is no longer active — it was cancelled or already sold.', 'error');
+          document.getElementById('buyModal').style.display = 'none';
+          loadListings(); // refresh
+        } else {
+          showToast(friendlyError(msg), 'error');
+        }
+      }
+      btn.textContent = 'Sign & Buy Now'; btn.disabled = false;
+    }
+
+    // === CANCEL LISTING ===
+    async function cancelListing(mintAddr) {
+      try {
+        const provider = window.x1 || window.backpack || (window.solana && !window.solana.isBraveWallet && !window.solana.isPhantom ? window.solana : null);
+        if (!provider) { showToast('No wallet found', 'error'); return; }
+        if (!provider.publicKey) await provider.connect();
+
+        const connection = new solanaWeb3.Connection(X1_RPC, 'confirmed');
+        const seller = provider.publicKey;
+        const mintPubkey = new solanaWeb3.PublicKey(mintAddr);
+        const programId = new solanaWeb3.PublicKey(MARKETPLACE_PROGRAM_ID);
+        const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID_STR);
+        const ASSOC = new solanaWeb3.PublicKey(ASSOC_TOKEN_PROGRAM_STR);
+
+        const [listingPDA] = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from('listing'), mintPubkey.toBuffer()], programId);
+        const [escrowPDA] = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from('escrow'), mintPubkey.toBuffer()], programId);
+        const sellerATA = solanaWeb3.PublicKey.findProgramAddressSync([seller.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintPubkey.toBuffer()], ASSOC)[0];
+
+        const data = Buffer.from([41, 183, 50, 232, 230, 233, 157, 70]); // cancel_listing
+        const memo = makeMemo('MoltGrid Marketplace: Cancel NFT Listing', seller);
+
+        const ix = new solanaWeb3.TransactionInstruction({
+          programId,
+          keys: [
+            { pubkey: seller, isSigner: true, isWritable: true },
+            { pubkey: mintPubkey, isSigner: false, isWritable: false },
+            { pubkey: listingPDA, isSigner: false, isWritable: true },
+            { pubkey: escrowPDA, isSigner: false, isWritable: true },
+            { pubkey: sellerATA, isSigner: false, isWritable: true },
+            { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+            { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
+          ],
+          data,
+        });
+
+        const tx = new solanaWeb3.Transaction().add(memo).add(ix);
+        tx.feePayer = seller;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+        const signed = await provider.signTransaction(tx);
+        const sig = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(sig, 'confirmed');
+
+        showToast('Listing cancelled! NFT returned to wallet.', 'success');
+
+        // Optimistic UI: mark as owned, remove from listings
+        const nft = myNfts.find(n => n.mint === mintAddr);
+        if (nft) { nft.isListed = false; delete nft.price; delete nft.currency; }
+        activeListings = activeListings.filter(l => l.nftMint !== mintAddr);
+        renderMyNFTs();
+        renderListings();
+        showTab('myCollection');
+        setTimeout(() => { loadListings(); loadMyNFTs(); }, 3000);
+      } catch (err) {
+        console.error('Cancel failed:', err);
+        const msg = err.message || 'Rejected';
+        if (msg.includes('ListingInactive')) {
+          showToast('This listing was already cancelled.', 'error');
+          loadListings(); loadMyNFTs();
+        } else {
+          showToast('Cancel failed: ' + msg, 'error');
+        }
+      }
+    }
+
+    // === TRANSFER NFT ===
+    async function transferNft(mintAddr, nftName) {
+      const recipient = prompt('Enter recipient wallet address:');
+      if (!recipient || recipient.length < 32) return;
+
+      try {
+        const provider = window.x1 || window.backpack || (window.solana && !window.solana.isBraveWallet && !window.solana.isPhantom ? window.solana : null);
+        if (!provider) { showToast('No wallet found', 'error'); return; }
+        if (!provider.publicKey) await provider.connect();
+
+        const connection = new solanaWeb3.Connection(X1_RPC, 'confirmed');
+        const sender = provider.publicKey;
+        const mintPubkey = new solanaWeb3.PublicKey(mintAddr);
+        const recipientPubkey = new solanaWeb3.PublicKey(recipient);
+        const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey(TOKEN_PROGRAM_ID_STR);
+        const ASSOC = new solanaWeb3.PublicKey(ASSOC_TOKEN_PROGRAM_STR);
+
+        const senderATA = solanaWeb3.PublicKey.findProgramAddressSync([sender.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintPubkey.toBuffer()], ASSOC)[0];
+        const recipientATA = solanaWeb3.PublicKey.findProgramAddressSync([recipientPubkey.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintPubkey.toBuffer()], ASSOC)[0];
+
+        // Check if recipient ATA exists, if not create it
+        const recipientInfo = await connection.getAccountInfo(recipientATA);
+        const memo = makeMemo('MoltGrid Marketplace: Transfer NFT to ' + recipient.slice(0,8) + '...', sender);
+
+        const tx = new solanaWeb3.Transaction().add(memo);
+
+        if (!recipientInfo) {
+          // Create associated token account for recipient
+          tx.add(new solanaWeb3.TransactionInstruction({
+            programId: ASSOC,
+            keys: [
+              { pubkey: sender, isSigner: true, isWritable: true },
+              { pubkey: recipientATA, isSigner: false, isWritable: true },
+              { pubkey: recipientPubkey, isSigner: false, isWritable: false },
+              { pubkey: mintPubkey, isSigner: false, isWritable: false },
+              { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
+              { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+            ],
+            data: Buffer.alloc(0),
+          }));
+        }
+
+        // SPL token transfer (amount = 1 for NFT)
+        const transferData = Buffer.alloc(9);
+        transferData[0] = 3; // Transfer instruction index
+        transferData.writeBigUInt64LE(1n, 1); // amount = 1
+        tx.add(new solanaWeb3.TransactionInstruction({
+          programId: TOKEN_PROGRAM_ID,
+          keys: [
+            { pubkey: senderATA, isSigner: false, isWritable: true },
+            { pubkey: recipientATA, isSigner: false, isWritable: true },
+            { pubkey: sender, isSigner: true, isWritable: false },
+          ],
+          data: transferData,
+        }));
+
+        tx.feePayer = sender;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+        const signed = await provider.signTransaction(tx);
+        const sig = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(sig, 'confirmed');
+
+        showToast('NFT transferred to ' + recipient.slice(0,6) + '...' + recipient.slice(-4) + '!', 'success');
+        loadMyNFTs(); setTimeout(() => loadMyNFTs(), 3000);
+      } catch (err) {
+        console.error('Transfer failed:', err);
+        showToast(friendlyError(err.message || 'Rejected'), 'error');
+      }
+    }
+
+    // === WALLET ===
+    async function connectWallet() {
+      try {
+        const provider = window.x1 || window.backpack || (window.solana && !window.solana.isBraveWallet && !window.solana.isPhantom ? window.solana : null);
+        if (!provider) { alert('Please install X1 Wallet or Backpack browser extension.'); return; }
+        const resp = await provider.connect();
+        const addr = resp.publicKey.toString();
+        localStorage.setItem('moltgrid_wallet', addr);
+        showWalletConnected(addr);
+        showToast('Wallet connected!', 'success');
+      } catch (err) { showToast('Connection failed', 'error'); }
+    }
+
+    function showWalletConnected(addr) {
+      const btn = document.getElementById('connectBtn') || document.getElementById('connectWalletBtn');
+      if (!btn) return;
+      btn.textContent = addr.slice(0,4) + '...' + addr.slice(-4);
+      btn.style.background = 'var(--glass-bg)';
+      btn.style.boxShadow = 'none';
+      btn.onclick = null;
+      // Show disconnect button
+      let disc = document.getElementById('disconnectBtn');
+      if (!disc) {
+        disc = document.createElement('button');
+        disc.id = 'disconnectBtn';
+        disc.className = 'btn btn-ghost';
+        disc.style.cssText = 'font-size:12px;padding:8px 12px;color:var(--error);';
+        disc.textContent = '✕';
+        disc.title = 'Disconnect Wallet';
+        disc.onclick = disconnectWallet;
+        btn.parentNode.insertBefore(disc, btn.nextSibling);
+      }
+    }
+
+    function refreshAll() {
+      loadListings(); loadMyNFTs();
+      setTimeout(() => { loadListings(); loadMyNFTs(); }, 2000);
+      setTimeout(() => { loadListings(); loadMyNFTs(); }, 5000);
+    }
+
+    function disconnectWallet() {
+      localStorage.removeItem('moltgrid_wallet');
+      localStorage.removeItem('moltgrid_agent');
+      const provider = window.x1 || window.backpack || (window.solana && !window.solana.isBraveWallet && !window.solana.isPhantom ? window.solana : null);
+      if (provider?.disconnect) provider.disconnect();
+      window.location.href = 'index.html';
+    }
+
+    // === TOAST ===
+    function showToast(msg, type = 'info') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.classList.add('show'), 10);
+      setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
+    }
+
+    // === INIT ===
+    (function() {
+      const saved = localStorage.getItem('moltgrid_wallet');
+      if (saved) showWalletConnected(saved);
+      loadListings();
+    })();
+  </script>
+<script src="wallet-nav.js"></script>
+</body>
+</html>
